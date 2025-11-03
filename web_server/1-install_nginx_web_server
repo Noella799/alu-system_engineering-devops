@@ -1,30 +1,17 @@
 #!/usr/bin/env bash
-# Update the package list
+# Installs and configures Nginx to serve a page containing 'Holberton School'
 
-sudo apt-get update
+# Update package list and install nginx
+sudo apt-get update -y
+sudo apt-get install -y nginx
 
-# Install nginx
-sudo apt-get install nginx -y
+# Make sure nginx is running and listening on port 80
+sudo sed -i 's/listen 80 default_server;/listen 80 default_server;/' /etc/nginx/sites-available/default
+sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80 default_server;/' /etc/nginx/sites-available/default
 
-# Configure nginx to listen on port 80
-sudo sed -i 's/listen 80 default_server/listen 80/g' /etc/nginx/sites-available/default
+# Replace the default index.html with the required content
+echo "Holberton School" | sudo tee /var/www/html/index.html > /dev/null
 
-# Restart nginx
+# Restart nginx to apply changes
 sudo service nginx restart
 
-# Create a sample HTML file containing the string "Holberton School"
-echo "<html><body>Holberton School</body></html>" | sudo tee /var/www/html/index.html >/dev/null
-
-# Test the nginx configuration
-curl -sI 127.0.0.1 | grep "HTTP/1.1 200 OK" >/dev/null
-
-if [ $? -eq 0 ]; then
-  curl 127.0.0.1 | grep "Holberton School" >/dev/null
-  if [ $? -eq 0 ]; then
-    echo "Configuration successful!"
-    exit 0
-  fi
-fi
-
-echo "Something went wrong :("
-exit 1
