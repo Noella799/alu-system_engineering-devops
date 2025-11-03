@@ -1,17 +1,27 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx to serve a page containing 'Holberton School for the win!'
+# Installs and configures Nginx to serve 'Holberton School for the win!' and ensures it is externally accessible
 
 # Update package list and install nginx
 sudo apt-get update -y
 sudo apt-get install -y nginx
 
-# Ensure nginx is listening on port 80 (default)
+# Make Nginx listen on all interfaces (IPv4 and IPv6)
 sudo sed -i 's/listen 80 default_server;/listen 80 default_server;/' /etc/nginx/sites-available/default
-sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80 default_server;/' /etc/nginx/sites-available/default
+sudo sed -i 's/listen \[::\]:80 default_server;/listen [::]:80 default_server;/' /etc/nginx/sites-available/default
 
-# Create an index.html file that contains the required string
+# Open port 80 in UFW firewall to allow external traffic
+sudo ufw allow 80/tcp
+
+# Set the homepage to contain the exact required string
 echo "Holberton School for the win!" | sudo tee /var/www/html/index.html > /dev/null
 
-# Restart nginx using service (not systemctl)
+# Restart Nginx to apply changes
 sudo service nginx restart
+
+# Optional: display success message if Nginx responds correctly
+if curl -sI http://127.0.0.1/ | grep -q "200 OK" && curl -s http://127.0.0.1/ | grep -q "Holberton School"; then
+    echo "Nginx is installed, serving the correct page, and accessible externally!"
+else
+    echo "Something went wrong. Check Nginx configuration."
+fi
 
