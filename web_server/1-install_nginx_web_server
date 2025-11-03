@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx to serve a page containing 'Holberton School'
+# Installs and configures Nginx to serve a page containing 'Holberton School for the win!'
 
 # Update package list and install nginx
 sudo apt-get update -y
 sudo apt-get install -y nginx
 
-# Make sure nginx is running and listening on port 80
+# Ensure nginx is listening on port 80 (default)
 sudo sed -i 's/listen 80 default_server;/listen 80 default_server;/' /etc/nginx/sites-available/default
 sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80 default_server;/' /etc/nginx/sites-available/default
 
-# Replace the default index.html with the required content
-echo "Holberton School" | sudo tee /var/www/html/index.html > /dev/null
+# Create an index.html file that contains the required string
+echo "Holberton School for the win!" | sudo tee /var/www/html/index.html > /dev/null
 
-# Restart nginx to apply changes
+# Restart nginx using service (not systemctl)
 sudo service nginx restart
 
