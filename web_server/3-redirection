@@ -1,4 +1,5 @@
-onfigures Nginx server with a 301 redirect for /redirect_me
+#!/usr/bin/env bash
+# Configures Nginx server with a 301 redirect for /redirect_me
 
 # Update packages
 apt-get update -y
@@ -9,8 +10,8 @@ apt-get install nginx -y
 # Create the index page
 echo "Holberton School" > /var/www/html/index.html
 
-# Add redirect configuration
-sed -i '/server_name _;/a \\n\tlocation /redirect_me {\n\t\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}' /etc/nginx/sites-available/default
+# Configure redirect using sed to add redirect rule in server block
+sed -i '/listen 80 default_server;/a \    location /redirect_me { return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4; }' /etc/nginx/sites-available/default
 
-# Restart nginx
-service nginx restart
+# Start nginx
+service nginx start
