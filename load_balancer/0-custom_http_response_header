@@ -1,45 +1,21 @@
 #!/usr/bin/env bash
-# Configures Nginx to add custom header X-Served-By with server hostname
+# Configures Nginx with a custom HTTP header
 
-# Update packages and install nginx
+# Update packages
 apt-get update -y
+
+# Install nginx
 apt-get install nginx -y
 
-# Set the hostname properly (web-01 or web-02)
-if [ -z "$(hostname | grep web-)" ]; then
-    # If hostname doesn't contain 'web-', set it based on IP or other logic
-    # This ensures the hostname is properly set for the X-Served-By header
-    if [ "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)" = "13.218.25.33" ]; then
-        hostnamectl set-hostname web-01
-    else
-        hostnamectl set-hostname web-02
-    fi
-fi
+# Create the index page
+echo "Holberton School" > /var/www/html/index.html
 
-# Create basic web page
-mkdir -p /var/www/html
-echo "Hello World!" > /var/www/html/index.html
+# Get the hostname
+# shellcheck disable=SC2154
+HOSTNAME=$(hostname)
 
-# Configure Nginx with custom header
-cat > /etc/nginx/sites-available/default << 'EOF'
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-    index index.html index.htm;
-    server_name _;
-
-    location / {
-        try_files $uri $uri/ =404;
-        add_header X-Served-By $hostname always;
-    }
-}
-EOF
+# Add custom header to nginx config
+sed -i "/server_name _;/a \\\\tadd_header X-Served-By \$hostname;" /etc/nginx/sites-available/default
 
 # Restart nginx
 service nginx restart
-
-# Test the configuration
-echo "Testing X-Served-By header:"
-curl -sI localhost | grep X-Served-By
