@@ -1,21 +1,30 @@
+cat > 0-custom_http_response_header << 'EOF'
 #!/usr/bin/env bash
-# Configures Nginx with a custom HTTP header
+# Configures Nginx to add custom header X-Served-By with server hostname
 
-# Update packages
 apt-get update -y
-
-# Install nginx
 apt-get install nginx -y
 
-# Create the index page
-echo "Holberton School" > /var/www/html/index.html
+mkdir -p /var/www/html
+echo "Hello World!" > /var/www/html/index.html
 
-# Get the hostname
-# shellcheck disable=SC2154
-HOSTNAME=$(hostname)
+cat > /etc/nginx/sites-available/default << 'NGINX_EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
 
-# Add custom header to nginx config
-sed -i "/server_name _;/a \\\\tadd_header X-Served-By \$hostname;" /etc/nginx/sites-available/default
+    root /var/www/html;
+    index index.html index.htm;
+    server_name _;
 
-# Restart nginx
-service nginx restart
+    location / {
+        try_files \$uri \$uri/ =404;
+        add_header X-Served-By \$hostname always;
+    }
+}
+NGINX_EOF
+
+# For container environments
+nginx -s stop 2>/dev/null || true
+nginx
+EOF
