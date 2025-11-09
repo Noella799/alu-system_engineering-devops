@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            text-align: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            margin: 20px;
+        }
+        
+        h1 {
+            font-size: 8rem;
+            margin: 0;
+            color: #ff6b6b;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin: 20px 0;
+        }
+        
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        
+        .creative-text {
+            font-style: italic;
+            font-size: 1.4rem;
+            color: #ffe66d;
+            margin: 30px 0;
+            padding: 15px;
+            border: 2px dashed #ffe66d;
+            border-radius: 10px;
+        }
+        
+        .home-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #4ecdc4;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .home-button:hover {
+            background: #45b7af;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .animation {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="animation">🚀</div>
+        <h1>404</h1>
+        <h2>Oops! Lost in Space</h2>
+        <p>It seems the page you're looking for has drifted off into the cosmos. Don't worry, even astronauts get lost sometimes!</p>
+        
+        <div class="creative-text">
+            "Ceci n'est pas une page"
+        </div>
+        
+        <p>While we search the galaxy for your missing page, why not return to safety?</p>
+        
+        <a href="/" class="home-button">Beam Me Home</a>
+    </div>
+</body>
+</html>
