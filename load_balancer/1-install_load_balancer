@@ -7,11 +7,26 @@ apt-get update -y
 # Install HAProxy
 apt-get install haproxy -y
 
-# Backup original config
-cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
-
 # Configure HAProxy
-cat >> /etc/haproxy/haproxy.cfg << 'EOF'
+cat > /etc/haproxy/haproxy.cfg << 'EOF'
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log global
+    mode http
+    option httplog
+    option dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
 
 frontend http_front
     bind *:80
@@ -23,8 +38,8 @@ backend http_back
     server 6901-web-02 54.197.181.3:80 check
 EOF
 
-# Enable HAProxy init script
-echo "ENABLED=1" > /etc/default/haproxy
+# Enable HAProxy to start on boot
+systemctl enable haproxy
 
 # Restart HAProxy
 service haproxy restart
