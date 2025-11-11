@@ -1,30 +1,34 @@
-cat > 0-custom_http_response_header << 'EOF'
+ssh -i ~/.ssh/my_keygen ubuntu@3.82.113.10 << 'EOF'
 #!/usr/bin/env bash
-# Configures Nginx to add custom header X-Served-By with server hostname
+# Configure Nginx server with custom X-Served-By header
 
-apt-get update -y
-apt-get install nginx -y
+sudo apt-get update -y
+sudo apt-get install -y nginx
 
-mkdir -p /var/www/html
-echo "Hello World!" > /var/www/html/index.html
+# Get the actual hostname
+HOSTNAME=$(hostname)
 
-cat > /etc/nginx/sites-available/default << 'NGINX_EOF'
+# Create config with custom header
+sudo tee /etc/nginx/sites-available/default > /dev/null <<CONFIG
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
     root /var/www/html;
-    index index.html index.htm;
+    index index.html index.htm index.nginx-debian.html;
     server_name _;
 
     location / {
+        add_header X-Served-By \$HOSTNAME always;
         try_files \$uri \$uri/ =404;
-        add_header X-Served-By \$hostname always;
     }
 }
-NGINX_EOF
+CONFIG
 
-# For container environments
-nginx -s stop 2>/dev/null || true
-nginx
+# Test configuration
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx
+sudo systemctl enable nginx
 EOF
