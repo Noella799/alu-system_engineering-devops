@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# Install Nginx and ensure the default site returns X-Served-By=<hostname> on every HTTP response (Ubuntu 16.04 safe)
+# Install Nginx and ensure every HTTP response includes X-Served-By=$hostname (Ubuntu 16.04-safe, idempotent)
 
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
+# 1) Install nginx
 apt-get update -y
 apt-get install -y nginx
 
-# Overwrite the default site with a minimal, known-good config that adds the header at server{} scope
+# 2) Overwrite the default site so the header is guaranteed on a stock 16.04 layout
+#    Use Nginx's $hostname and 'always' so 2xx/3xx/4xx/5xx include it.
 cat >/etc/nginx/sites-available/default <<'EOF'
 server {
     listen 80 default_server;
@@ -18,7 +20,6 @@ server {
 
     server_name _;
 
-    # Add a response header indicating which host served the request
     add_header X-Served-By $hostname always;
 
     location / {
@@ -27,10 +28,11 @@ server {
 }
 EOF
 
-# Validate and reload Nginx
+# 3) Validate & reload (works on old/new Ubuntu)
 nginx -t
 if command -v systemctl >/dev/null 2>&1; then
   systemctl reload nginx
 else
   service nginx reload
 fi
+
