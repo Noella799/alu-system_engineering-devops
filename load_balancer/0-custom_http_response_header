@@ -1,38 +1,35 @@
 #!/usr/bin/env bash
-# Install Nginx and ensure every HTTP response includes X-Served-By=$hostname (Ubuntu 16.04-safe, idempotent)
+# Configure Nginx server with custom X-Served-By header
 
-set -euo pipefail
-export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update -y
+sudo apt-get install -y nginx
 
-# 1) Install nginx
-apt-get update -y
-apt-get install -y nginx
+# Get the actual hostname
+HOSTNAME=$(hostname)
 
-# 2) Overwrite the default site so the header is guaranteed on a stock 16.04 layout
-#    Use Nginx's $hostname and 'always' so 2xx/3xx/4xx/5xx include it.
-cat >/etc/nginx/sites-available/default <<'EOF'
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
-
-    server_name _;
-
-    add_header X-Served-By $hostname always;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
+config=\
+"server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+        server_name _;
+        
+        location / {
+            add_header X-Served-By $HOSTNAME;
+            try_files \$uri \$uri/ =404;
+        }
 }
-EOF
+"
 
-# 3) Validate & reload (works on old/new Ubuntu)
-nginx -t
-if command -v systemctl >/dev/null 2>&1; then
-  systemctl reload nginx
-else
-  service nginx reload
-fi
+# Create or overwrite the default configuration
+echo "$config" | sudo tee /etc/nginx/sites-available/default > /dev/null
 
+# Test the configuration before restarting
+sudo nginx -t
+
+# Restart Nginx
+sudo service nginx restart
+
+# Enable Nginx to start on boot
+sudo systemctl enable nginx
